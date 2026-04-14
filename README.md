@@ -95,13 +95,13 @@ xeniumranger import-segmentation \
     --localmem      48
 ```
 
-See the [xenium-benchmark](../xenium-benchmark) project for converters that produce the correct input formats.
+See the [xenium-segmentation-benchmark](../xenium-segmentation-benchmark) project for converters that produce the correct input formats.
 
 ## Coordinate system
 
 The subset uses **subset-relative coordinates**: the top-left corner of the ROI (minus the margin) is `(0, 0)`. Downstream segmentation tools work in this space.
 
-When importing into Xenium Explorer via xeniumranger, cell boundaries and transcript assignments must be converted back to **original Xenium coordinates** by adding `x_offset_um` and `y_offset_um` from `subset_offsets.json`. The converter scripts in [xenium-benchmark](../xenium-benchmark) handle this automatically.
+When importing into Xenium Explorer via xeniumranger, cell boundaries and transcript assignments must be converted back to **original Xenium coordinates** by adding `x_offset_um` and `y_offset_um` from `subset_offsets.json`. The converter scripts in [xenium-segmentation-benchmark](../xenium-segmentation-benchmark) handle this automatically.
 
 **Note on morphology alignment**: The `transcripts.zarr.zip` in the bundle is from the original full-slide Xenium output and uses original coordinates. The cropped morphology image starts at pixel `(0,0)`, which Xenium Explorer maps to µm `(0,0)`. This means the morphology image will appear offset from the transcripts/cells by `(x_offset_um, y_offset_um)` in the final Explorer view. For benchmarking purposes this is generally acceptable. Full coordinate-aligned subset bundles (requiring subsetting of the transcripts zarr) are a planned future feature.
 

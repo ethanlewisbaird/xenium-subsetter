@@ -23,7 +23,7 @@ which means the morphology will appear offset from the transcripts by
 
 For correct alignment, segmentation outputs (cell boundaries, viz polygons)
 must be converted to ORIGINAL Xenium coordinates before running xeniumranger.
-See converters in the xenium-benchmark project for this transform.
+See converters in the xenium-segmentation-benchmark project for this transform.
 
 The subset_offsets.json written by subset.py records the required offsets.
 
@@ -173,7 +173,7 @@ def build_xenium_bundle(
             f"\n  IMPORTANT: subset offsets are "
             f"x={offsets['x_offset_um']:.2f} µm, y={offsets['y_offset_um']:.2f} µm\n"
             f"  Segmentation outputs must be converted to original Xenium coordinates\n"
-            f"  before running xeniumranger. Use the converters in xenium-benchmark."
+            f"  before running xeniumranger. Use the converters in xenium-segmentation-benchmark."
         )
 
     print(f"\nBundle created at: {output_dir}")
