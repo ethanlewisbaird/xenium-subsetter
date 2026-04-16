@@ -118,11 +118,19 @@ def build_xenium_bundle(
 
     # ── Small shared files (always copy) ─────────────────────────────────────
     small_files = ["gene_panel.json", "nucleus_boundaries.parquet",
-                   "nucleus_boundaries.csv.gz"]
+                   "nucleus_boundaries.csv.gz", "metrics_summary.csv"]
     for fname in small_files:
         src = xenium_dir / fname
         if src.exists():
             link_or_copy(src, output_dir / fname, always_copy=True)
+
+    # ── morphology.ome.tif (overview single-file TIF, from original outs/) ───
+    morph_overview_src = xenium_dir / "morphology.ome.tif"
+    if morph_overview_src.exists():
+        link_or_copy(morph_overview_src, output_dir / "morphology.ome.tif")
+        print(f"  Linked morphology.ome.tif ({morph_overview_src.stat().st_size / 1e6:.0f} MB)")
+    else:
+        print(f"  WARNING: morphology.ome.tif not found in {xenium_dir}")
 
     # ── Subset-specific files (copy from subset_dir) ─────────────────────────
     # Morphology: use the cropped subset image (NB: coordinate offset applies,
