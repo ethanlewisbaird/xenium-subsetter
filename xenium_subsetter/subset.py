@@ -184,7 +184,32 @@ def crop_morphology(
     out_dir = output_dir / "morphology_focus"
     out_dir.mkdir(exist_ok=True)
     dst = out_dir / "ch0000_dapi.ome.tif"
-    tifffile.imwrite(str(dst), crop)
+
+    # xeniumranger 4.x requires a <UUID> element inside <TiffData> in the
+    # OME-XML, which plain tifffile.imwrite does not add.  Build a minimal
+    # OME-XML description with a self-referencing UUID so the bundle passes
+    # xeniumranger's morphology validation.
+    import uuid as _uuid
+    ome_uuid = f"urn:uuid:{_uuid.uuid4()}"
+    h, w = (crop.shape[-2], crop.shape[-1]) if crop.ndim >= 2 else crop.shape
+    ome_xml = (
+        f'<?xml version="1.0" encoding="UTF-8"?>'
+        f'<OME xmlns="http://www.openmicroscopy.org/Schemas/OME/2016-06" '
+        f'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" '
+        f'xsi:schemaLocation="http://www.openmicroscopy.org/Schemas/OME/2016-06 '
+        f'http://www.openmicroscopy.org/Schemas/OME/2016-06/ome.xsd" '
+        f'UUID="{ome_uuid}">'
+        f'<Image ID="Image:0" Name="Image0"><Pixels ID="Pixels:0" '
+        f'DimensionOrder="XYCZT" Type="uint16" '
+        f'SizeX="{w}" SizeY="{h}" SizeC="1" SizeZ="1" SizeT="1" '
+        f'PhysicalSizeX="0.2125" PhysicalSizeXUnit="µm" '
+        f'PhysicalSizeY="0.2125" PhysicalSizeYUnit="µm">'
+        f'<Channel ID="Channel:0:0" SamplesPerPixel="1"><LightPath/></Channel>'
+        f'<TiffData IFD="0" PlaneCount="1">'
+        f'<UUID FileName="ch0000_dapi.ome.tif">{ome_uuid}</UUID>'
+        f'</TiffData></Pixels></Image></OME>'
+    )
+    tifffile.imwrite(str(dst), crop, description=ome_xml)
     print(f"  Written to {dst} ({crop.shape})")
 
     # Also write a resized version for BIDCell
